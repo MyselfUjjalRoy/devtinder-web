@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
@@ -7,7 +8,7 @@ const NavBar = () => {
     <div className="navbar bg-base-300 shadow-sm px-4">
       {/* Left Side: Logo */}
       <div className="flex-1">
-        <a className="btn btn-ghost text-xl">🧑‍💻DevTinder</a>
+        <Link to="/" className="btn btn-ghost text-xl">🧑‍💻DevTinder</Link>
       </div>
 
       {/* Right Side: Only shows if user exists */}
@@ -39,7 +40,10 @@ const NavBar = () => {
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
               >
                 <li>
-                  <a>Profile</a>
+                  <Link to="/profile" className="justify-between">
+                    Profile
+                    <span className="badge">New</span>
+                  </Link>
                 </li>
                 <li>
                   <a>Settings</a>
