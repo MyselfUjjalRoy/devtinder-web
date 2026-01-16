@@ -24,7 +24,14 @@ const Connections = () => {
   }, []);
 
   if (!connections) return null;
-  if (connections.length == 0) return <h1>NO CONNECTIONS FOUND</h1>;
+  if (connections.length == 0)
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#050505]">
+        <h1 className="text-slate-600 font-mono tracking-widest uppercase italic">
+          No Connections Found
+        </h1>
+      </div>
+    );
 
   return (
     <div
