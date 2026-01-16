@@ -6,138 +6,217 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 
 function EditProfile({ user }) {
-  const [firstName, setFirstName] = useState(user.firstName);
-  const [lastName, setLastName] = useState(user.lastName);
-  const [photoUrl, setPhotoUrl] = useState(user.photoUrl);
-  const [age, setAge] = useState(user.age);
-  const [gender, setGender] = useState(user.gender);
-  const [about, setAbout] = useState(user.about);
+  const [firstName, setFirstName] = useState(user.firstName || "");
+  const [lastName, setLastName] = useState(user.lastName || "");
+  const [photoUrl, setPhotoUrl] = useState(user.photoUrl || "");
+  const [age, setAge] = useState(user.age || "");
+  const [gender, setGender] = useState(user.gender || "");
+  const [about, setAbout] = useState(user.about || "");
   const [error, setError] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); // New loading state
   const dispatch = useDispatch();
 
   const saveProfile = async () => {
-    //clear error message
+    // 1. Instant Feedback: Show toast immediately
+    setShowToast(true);
+    setIsSaving(true);
     setError("");
+
+    // Auto-hide toast after 3 seconds
+    setTimeout(() => setShowToast(false), 3000);
+
     try {
       const res = await axios.patch(
         BASE_URL + "/profile/edit",
-        {
-          firstName,
-          lastName,
-          photoUrl,
-          age,
-          gender,
-          about,
-        },
+        { firstName, lastName, photoUrl, age, gender, about },
         { withCredentials: true }
       );
       dispatch(addUser(res?.data?.data));
-      setShowToast(true);
-      setTimeout(() => {
-        setShowToast(false);
-      }, 3000);
     } catch (error) {
-      setError(error.response.data);
+      // If it fails, we hide the success toast and show an error
+      setShowToast(false);
+      setError(error.response?.data || "Something went wrong");
+    } finally {
+      setIsSaving(false);
     }
   };
 
+  const inputStyle =
+    "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white text-base focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all placeholder:text-white/10";
+  const labelStyle =
+    "text-[10px] font-bold text-indigo-400 uppercase tracking-widest ml-1 mb-1 block";
+
   return (
-    <>
-      <div className="flex justify-center my-10">
-        <div className="flex justify-center mx-10">
-          <div className="card bg-base-300 w-96 shadow-sm">
-            <div className="card-body">
-              <h2 className="card-title justify-center">Edit Profile</h2>
-              <div>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">First Name:</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={firstName}
-                    className="input input-bordered w-full max-w-xs"
-                    onChange={(e) => setFirstName(e.target.value)}
-                  />
-                </label>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">Last Name:</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={lastName}
-                    className="input input-bordered w-full max-w-xs"
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                </label>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">Photo URL:</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={photoUrl}
-                    className="input input-bordered w-full max-w-xs"
-                    onChange={(e) => setPhotoUrl(e.target.value)}
-                  />
-                </label>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">Age:</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={age}
-                    className="input input-bordered w-full max-w-xs"
-                    onChange={(e) => setAge(e.target.value)}
-                  />
-                </label>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">Gender:</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={gender}
-                    className="input input-bordered w-full max-w-xs"
-                    onChange={(e) => setGender(e.target.value)}
-                  />
-                </label>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">About:</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={about}
-                    className="input input-bordered w-full max-w-xs"
-                    onChange={(e) => setAbout(e.target.value)}
-                  />
-                </label>
-              </div>
-              <p className="text-red-500">{error}</p>
-              <div className="card-actions justify-center m-2">
-                <button className="btn btn-primary" onClick={saveProfile}>
-                  Save Profile
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <UserCard
-          user={{ firstName, lastName, photoUrl, age, gender, about }}
-        />
-      </div>
+    <div className="w-full h-full flex items-center justify-center overflow-hidden py-4 relative bg-[#030303]">
+      {/* INSTANT TOAST */}
       {showToast && (
-        <div className="toast toast-top toast-center">
-          <div className="alert alert-success">
-            <span>Profile saved successfully.</span>
+        <div className="fixed top-28 left-0 right-0 flex justify-center z-[100000] pointer-events-none px-4">
+          <div className="bg-[#111] border border-white/10 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-4 animate-[toastSlideDown_0.3s_cubic-bezier(0.18,0.89,0.32,1.28)]">
+            <div className="bg-green-500 p-1.5 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.5)]">
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="4"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <span className="text-sm font-bold text-white tracking-tight">
+              Profile saved successfully
+            </span>
           </div>
         </div>
       )}
-    </>
+
+      <div className="w-full max-w-4xl flex flex-col lg:flex-row items-center justify-center gap-12 px-6">
+        {/* LEFT: FORM SECTION */}
+        <div className="w-full lg:w-1/2 flex flex-col z-10">
+          <header className="mb-6">
+            <h2 className="text-4xl font-black text-white uppercase tracking-tighter">
+              User{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">
+                Profile
+              </span>
+            </h2>
+            <div className="h-1 w-12 bg-gradient-to-r from-indigo-600 to-purple-600 mt-2 rounded-full"></div>
+          </header>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelStyle}>First Name</label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className={inputStyle}
+                />
+              </div>
+              <div>
+                <label className={labelStyle}>Last Name</label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className={inputStyle}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={labelStyle}>Photo URL</label>
+              <input
+                type="text"
+                value={photoUrl}
+                onChange={(e) => setPhotoUrl(e.target.value)}
+                className={inputStyle}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelStyle}>Age</label>
+                <input
+                  type="number"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  className={inputStyle}
+                />
+              </div>
+
+              {/* BEAUTIFUL COLORFUL DROPDOWN */}
+              <div className="relative">
+                <label className={labelStyle}>Gender Identity</label>
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  className={`${inputStyle} appearance-none cursor-pointer bg-gradient-to-br from-white/10 to-white/5 hover:from-white/15`}
+                >
+                  <option value="" className="bg-[#111] text-gray-400">
+                    Identify as...
+                  </option>
+                  <option
+                    value="male"
+                    className="bg-[#111] text-indigo-400 font-bold"
+                  >
+                    ♂ Male
+                  </option>
+                  <option
+                    value="female"
+                    className="bg-[#111] text-pink-400 font-bold"
+                  >
+                    ♀ Female
+                  </option>
+                  <option
+                    value="other"
+                    className="bg-[#111] text-teal-400 font-bold"
+                  >
+                    ⚧ Other
+                  </option>
+                </select>
+                <div className="absolute right-4 bottom-3 pointer-events-none text-indigo-400">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="3"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className={labelStyle}>Bio / About</label>
+              <textarea
+                value={about}
+                onChange={(e) => setAbout(e.target.value)}
+                className={`${inputStyle} h-24 resize-none`}
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={saveProfile}
+            disabled={isSaving}
+            className="mt-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black uppercase tracking-widest text-xs transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSaving ? "Syncing..." : "Save Changes"}
+          </button>
+        </div>
+
+        {/* RIGHT: CLEAN PREVIEW */}
+        <div className="hidden lg:flex lg:w-1/2 justify-center items-center">
+          <div className="relative scale-[0.65] xl:scale-[0.75] origin-center transition-transform duration-500 ease-out hover:scale-[0.78]">
+            <div className="bg-[#111] rounded-[2.5rem] p-1 border border-white/5 shadow-2xl">
+              <UserCard
+                user={{ firstName, lastName, photoUrl, age, gender, about }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes toastSlideDown {
+          from { transform: translateY(-40px) scale(0.9); opacity: 0; }
+          to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+      `}</style>
+    </div>
   );
 }
 
