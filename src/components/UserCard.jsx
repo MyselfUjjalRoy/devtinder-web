@@ -1,6 +1,27 @@
+import axios from "axios";
+import { BASE_URL } from "../utils/constants";
+import { useDispatch } from "react-redux";
+import { removeUserFromFeed } from "../utils/feedSlice";
+
 const UserCard = ({ user }) => {
+  const dispatch = useDispatch();
   if (!user) return null;
-  const { firstName, lastName, photoUrl, age, gender, about } = user;
+  const { _id, firstName, lastName, photoUrl, age, gender, about } = user;
+
+  const handleSendRequest = async (status, userId) => {
+    try {
+      await axios.post(
+        BASE_URL + "/request/send/" + status + "/" + userId,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+      dispatch(removeUserFromFeed(userId));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const defaultImage =
     "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000&auto=format&fit=crop";
@@ -61,7 +82,10 @@ const UserCard = ({ user }) => {
         )}
 
         <div className="flex gap-4 mt-4">
-          <button className="flex-1 h-16 rounded-[1.5rem] bg-red-500/10 border border-red-500/20 text-red-500 text-[11px] font-black uppercase tracking-widest transition-all duration-300 hover:bg-red-500 hover:text-white hover:shadow-red-500/40 active:scale-95 flex items-center justify-center gap-2 group/ignore">
+          <button
+            className="flex-1 h-16 rounded-[1.5rem] bg-red-500/10 border border-red-500/20 text-red-500 text-[11px] font-black uppercase tracking-widest transition-all duration-300 hover:bg-red-500 hover:text-white hover:shadow-red-500/40 active:scale-95 flex items-center justify-center gap-2 group/ignore"
+            onClick={() => handleSendRequest("ignored", _id)}
+          >
             Ignore
             <svg
               className="w-4 h-4"
@@ -78,9 +102,12 @@ const UserCard = ({ user }) => {
             </svg>
           </button>
 
-          <button className="relative flex-[2] h-16 rounded-[1.5rem] bg-indigo-600 text-white text-[12px] font-black uppercase tracking-[0.3em] transition-all duration-300 hover:bg-white hover:text-indigo-600 active:scale-95 group/btn overflow-hidden">
+          <button
+            className="relative flex-[2] h-16 rounded-[1.5rem] bg-indigo-600 text-white text-[12px] font-black uppercase tracking-[0.3em] transition-all duration-300 hover:bg-white hover:text-indigo-600 active:scale-95 group/btn overflow-hidden"
+            onClick={() => handleSendRequest("interested", _id)}
+          >
             <span className="relative z-10 flex items-center justify-center gap-3">
-              Connect
+              Interested
               <svg
                 className="w-4 h-4"
                 fill="none"
