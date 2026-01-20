@@ -15,7 +15,7 @@ const UserCard = ({ user }) => {
         {},
         {
           withCredentials: true,
-        }
+        },
       );
       dispatch(removeUserFromFeed(userId));
     } catch (error) {
@@ -24,8 +24,7 @@ const UserCard = ({ user }) => {
   };
 
   const defaultImage =
-    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000&auto=format&fit=crop";
-
+    "https://tse2.mm.bing.net/th/id/OIP.ZnWcaa3QttHXFa7xjap_vAHaHa?pid=Api&P=0&h=180";
   return (
     /* Increased Width to 440px and Height to 75vh */
     <div className="relative w-[340px] sm:w-[440px] h-[75vh] min-h-[600px] bg-[#050505] rounded-[3.5rem] shadow-[0_0_60px_-12px_rgba(79,70,229,0.4)] border border-white/10 overflow-hidden group transition-all duration-500 hover:shadow-indigo-500/30 hover:-translate-y-2">
